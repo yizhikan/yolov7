@@ -133,7 +133,7 @@ def split_and_sample_frames(frame_times, motion_data, fps):
     cap = cv2.VideoCapture(VIDEO_PATH)
     for act_idx, act in enumerate(actions):
         for frame_idx in act["indices"]:
-            cap.set(cv2.CAP_PROP_POS_FRAMES(frame_idx))
+            cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
             ret, frame = cap.read()
             if not ret:
                 continue
