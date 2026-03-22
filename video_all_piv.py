@@ -13,9 +13,10 @@ from utils.general import non_max_suppression_kpt
 from utils.plots import output_to_keypoint
 
 # ===================== 全局参数 =====================
-VIDEO_PATH = "C:\\D\\pyproject\\dongzuoshibie\\线束管路连接.mp4"
+VIDEO_PATH = "C:\\D\\pyproject\\dongzuoshibie\\线束管路连接better.mp4"
 SAVE_PATH = 'C:\\D\\pyproject\\dongzuoshibie\\video_frames\\'
-MOTION_THRESH = 10.0
+SAVE_PATH_action_list = 'C:\\D\\pyproject\\dongzuoshibie\\'
+MOTION_THRESH = 5.0
 MIN_ACTION_DURATION = 0.5
 ALI_API_KEY = "sk-1777fc7b981c4e9f90dcb10fddbd7ba8"
 SAMPLE_PER_ACTION = 2
@@ -228,7 +229,25 @@ def merge_similar_actions(action_list, client, recognize_action_func):
 
     print(f"✅ 动作合并完成：原始{len(action_list)}个 → 合并后{len(merged_actions)}个")
     return merged_actions
+
 # ===================== 主流程 =====================
+# if __name__ == "__main__":
+#     print("=" * 60)
+#     print("✅ 视频动作分割 | 保存完整画面 | AI动作识别")
+#     print("=" * 60)
+#
+#     frame_times, motion_data, fps = get_wrist_motion()
+#     action_list = split_and_sample_frames(frame_times, motion_data, fps)
+#     save_action_list(action_list, SAVE_PATH_action_list+"action_segment_result.json")
+#
+#     for i, act in enumerate(action_list):
+#         action_name = recognize_action(act["imgs"])
+#         print(f"动作{i + 1} | {act['start']}s ~ {act['end']}s | 全图数量：{len(act['imgs'])} | 识别结果：{action_name}")
+#
+#     print("=" * 60)
+#     print(f"✅ 完整画面已保存至：{SAVE_PATH}")
+#     print("处理完成！")
+
 if __name__ == "__main__":
     print("=" * 60)
     print("✅ 视频动作分割 | 保存完整画面 | AI动作识别")
@@ -237,42 +256,26 @@ if __name__ == "__main__":
     frame_times, motion_data, fps = get_wrist_motion()
     action_list = split_and_sample_frames(frame_times, motion_data, fps)
 
+    # 1. AI识别所有动作名称
     for i, act in enumerate(action_list):
         action_name = recognize_action(act["imgs"])
+        act["action_name"] = action_name  # 存入动作字典
         print(f"动作{i + 1} | {act['start']}s ~ {act['end']}s | 全图数量：{len(act['imgs'])} | 识别结果：{action_name}")
+
+    # 2. 【调用新增函数】保存原始动作列表
+    save_action_list(action_list, SAVE_PATH_action_list+"action_segment_result.json")
+
+    # 3. 【调用新增函数】大模型语义合并动作片段
+    merged_action_list = merge_similar_actions(action_list, client, recognize_action)
+
+    # 4. 保存合并后的动作列表
+    save_action_list(merged_action_list, SAVE_PATH_action_list + "merged_action_result.json")
+
+    # 打印合并结果
+    print("\n📊 合并后的动作片段：")
+    for i, act in enumerate(merged_action_list):
+        print(f"合并动作{i + 1} | {act['start']}s ~ {act['end']}s | 动作：{act['action_name']}")
 
     print("=" * 60)
     print(f"✅ 完整画面已保存至：{SAVE_PATH}")
     print("处理完成！")
-
-# if __name__ == "__main__":
-#     print("=" * 60)
-#     print("✅ 视频动作分割 | 保存完整画面 | AI动作识别")
-#     print("=" * 60)
-#
-#     frame_times, motion_data, fps = get_wrist_motion()
-#     action_list = split_and_sample_frames(frame_times, motion_data, fps)
-#
-#     # 1. AI识别所有动作名称
-#     for i, act in enumerate(action_list):
-#         action_name = recognize_action(act["imgs"])
-#         act["action_name"] = action_name  # 存入动作字典
-#         print(f"动作{i + 1} | {act['start']}s ~ {act['end']}s | 全图数量：{len(act['imgs'])} | 识别结果：{action_name}")
-#
-#     # 2. 【调用新增函数】保存原始动作列表
-#     save_action_list(action_list)
-#
-#     # 3. 【调用新增函数】大模型语义合并动作片段
-#     merged_action_list = merge_similar_actions(action_list, client, recognize_action)
-#
-#     # 4. 保存合并后的动作列表
-#     save_action_list(merged_action_list, "merged_action_result.json")
-#
-#     # 打印合并结果
-#     print("\n📊 合并后的动作片段：")
-#     for i, act in enumerate(merged_action_list):
-#         print(f"合并动作{i + 1} | {act['start']}s ~ {act['end']}s | 动作：{act['action_name']}")
-#
-#     print("=" * 60)
-#     print(f"✅ 完整画面已保存至：{SAVE_PATH}")
-#     print("处理完成！")
