@@ -9,6 +9,7 @@ client = OpenAI(
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
 )
 
+
 # ===================== 核心配置 =====================
 VIDEO_PATH = "C:\\D\\pyproject\\dongzuoshibie\\线束管路连接better.mp4"
 # 目标：分割出15个动作（你的标准动作列表长度）
