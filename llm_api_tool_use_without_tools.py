@@ -13,6 +13,7 @@ client = OpenAI(
 VIDEO_PATH = "C:\\D\\pyproject\\dongzuoshibie\\线束管路连接better.mp4"
 TARGET_SEG_COUNT = 15
 
+
 # 【核心】强指令Prompt：强制模型必须调用工具，输出固定JSON，全自动执行
 SYSTEM_PROMPT = f"""你是专业的视频动作分割智能体，严格执行以下指令，禁止输出任何多余文字：
 1. 必须调用工具：yolo_action_segment
